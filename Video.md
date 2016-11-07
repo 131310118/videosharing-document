@@ -1,0 +1,81 @@
+## 视频库功能
+
+####视频：【video】
+
+	发布者【creater】
+	权限分组【team】
+    分类【category】
+    内容：【data】
+    {
+        标题【title】
+        摘要【summary】
+        视频【video】
+        缩略图【thumbnail】
+        时长【time】
+    }
+    评论：[]【comment】
+    (
+    {
+        评论者【commenter】
+        内容【content】
+        支持[]【sup】
+        反对[]【opp】
+        回复【reply】
+        发表时间【date】
+    }
+    )
+    弹幕：[]【barrage】
+    (
+    {
+        发送者【sender】
+        时间点【time】
+        内容【content】
+        发表时间【date】
+    }
+    )
+    计数：【count】
+    {
+        评论数（评论数+回复数）【comment】
+        弹幕数【barrage】
+    }
+    时间：【time】
+    {
+        创建时间【create】
+        更新时间【update】
+        软删除时间【delete】
+    }
+    类型（原创/转载）【type】
+    来源【source】
+    浏览次数【uv】
+    关键字：[]【key】
+    收藏数量【fav】
+    软删除【del】
+    审核状态【chk】
+
+####用户：【user】
+    
+	用户名【name】
+	密码【password】
+    个人信息：【info】
+    {
+        ...
+    }
+    头像【portrait】
+    视频【video】（可分类）
+    收藏夹【fav】（可多个收藏夹）
+    管理员【admin】
+    分组【team】
+####课程：【lesson】
+
+    课程号【num】
+    课程分组【team】
+    课时数【count】
+    课时：[]
+    (
+    {
+        标题【title】
+        作者【author】
+        资源格式【type】
+        下载链接or观看链接【url】
+    }
+    )
