@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div>
+    <input type="file" name="file" id="file"/>
+    <input type="text" name="name" id="name"/>
+    <input type="button" onclick="send()" value="Upload" />
+    <video width="320" height="240" controls="controls" id="video">
+        <!--<source src="/video/5858ad0831a0e95f5b8ade19ThuJul212016230614GMT080070498712.mp4" type="video/mp4">-->
+    </video>
+</div>
+<script>
+    function sendForm(){
+        var file = document.getElementById('file').files[0];
+        var fd = new FormData();//使用HTML表单来初始化一个FormData对象
+        console.log(file);
+        fd.append('file', file);
+        fd.append('type', 'video');
+        var xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function(data){
+            console.log(data)
+        }, false);
+        xhr.open("POST", "/api/uploadVideo", true);
+        xhr.setRequestHeader('authorization','Bearer ' + document.cookie.split('=')[1]);
+        xhr.send(fd);
+
+        xhr.addEventListener("load", function(){console.log(1)}, false);
+        xhr.addEventListener("error", function(){console.log(2)}, false);
+        xhr.addEventListener("abort", function(){console.log(3)}, false);
+        console.log(fd)
+    }
+    function send() {
+        var file = document.getElementById('file').files[0];
+        //var name = file.name;
+        var size = file.size;
+        var name = file.name;
+        var fileSplitSize = 1024 * 1024 * 2;
+        var id = (file.lastModifiedDate + "").replace(/\W/g, '') + size;
+        //var start = 0;
+        var MAX_LINK = 1;
+        var fileArray = [];
+        var count = Math.ceil(size / fileSplitSize);
+        var pastTime = 0;
+        var lastTime = 0;
+        var speed = 0;
+        for(var i = count; i > 0; i--) {
+            fileArray.push(i);
+        }
+        var funFileSize = function(conti) {
+            //data.append("name", name);
+            var current = fileArray.pop();
+            if(current === undefined) {
+                return;
+            }
+            var start = (current - 1) * fileSplitSize;
+            var end = current * fileSplitSize;
+            end = end > size ? size : end;
+            var data = new FormData();
+            data.append("offset", start);
+            data.append("filesize", size);
+            data.append("id", id);
+            data.append("chunks", count);
+            data.append("chunk", current);
+            data.append("name", name);
+            if(conti) {
+                data.append("conti", 1);
+                data.append("file", file.slice(start, end));
+            } else {
+                fileArray.push(current);
+                data.append("file", file.slice(start, start + 1024));
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open("put", "/api/uploadVideo", true);
+            xhr.setRequestHeader("authorization", "Bearer " + document.cookie.split('=')[1]);
+            xhr.onreadystatechange = function(e) {
+                if(xhr.readyState == 4) {
+                    if(xhr.status == 200) {
+                        //第一次上传包可能是续传，返回续传点
+                        if(xhr.response) {
+                            var json = JSON.parse(xhr.response);
+                            if(json.video) {
+                                console.log(json.video);
+                                return;
+                            }
+                            if(conti) {
+                                let currentTime = new Date() * 1;
+                                pastTime = (currentTime - lastTime) / 1000;
+                                lastTime = currentTime;
+                                speed = (end - start) / pastTime / 1000;
+                                console.log(end / size * 100 + "%");
+                                console.log(speed + "kb/s");
+                            } else {
+                                lastTime = new Date() * 1;
+                            }
+                            if(json.pos) {
+                                count = Math.ceil((size - json.pos) / fileSplitSize);
+                                fileArray.length = 0;
+                                for(var i = count; i > 0; i--) {
+                                    fileArray.push(i);
+                                }
+                                for(i = 0; i < MAX_LINK; i++) {
+                                    funFileSize(true);
+                                }
+                            } else if(json.chunk) {
+                                fileArray.push(xhr.response.block);
+                                funFileSize(true);
+                            } else {
+                                funFileSize(true);
+                            }
+                        }
+                    } else {
+                        fileArray.push(current);
+                        funFileSize(true);
+                    }
+                }
+            };
+            xhr.send(data);
+        };
+        funFileSize();
+    }
+    vidSource = document.getElementById("video");
+
+    vidSource.src = "/api/view/585ba7cf5319e4202a417391";
+   /* var typedArray = [];
+    var blob = new Blob([typedArray], {"type:": "video/mp4"});
+    document.getElementById("video").src = URL.createObjectURL(blob);
+    var xhr = new XMLHttpRequest();
+    xhr.open("get", "/api/view/585ba7cf5319e4202a417391", true);
+    xhr.setRequestHeader("authorization", "Bearer " + document.cookie.split('=')[1]);
+    xhr.onreadystatechange = function(e) {
+        if(xhr.readyState > 2) {
+            if(xhr.status == 200) {
+                if(xhr.response) {
+                    typedArray.push(xhr.response);
+                }
+            }
+        }
+    };
+    xhr.send();*/
+    /*var blob = new Blob(["/video/5858ad0831a0e95f5b8ade19ThuJul212016230614GMT080070498712.mp4"], {"type:": "video/mp4"});
+    document.getElementById("video").src = URL.createObjectURL(blob);*/
+   /* var xhr = new XMLHttpRequest();
+    xhr.open("get", "/api/view/585ba7cf5319e4202a417391", true);
+    xhr.setRequestHeader("authorization", "Bearer " + document.cookie.split('=')[1]);
+    xhr.onreadystatechange = function(e) {
+        if(xhr.readyState == 4) {
+            if(xhr.status == 200) {
+                //第一次上传包可能是续传，返回续传点
+                if(xhr.response) {
+                    var json = JSON.parse(xhr.response);
+                    if(json.video) {
+                        console.log(json.video);
+                        return;
+                    }
+                    if(conti) {
+                        let currentTime = new Date() * 1;
+                        pastTime = (currentTime - lastTime) / 1000;
+                        lastTime = currentTime;
+                        speed = (end - start) / pastTime / 1000;
+                        console.log(end / size * 100 + "%");
+                        console.log(speed + "kb/s");
+                    } else {
+                        lastTime = new Date() * 1;
+                    }
+                    if(json.pos) {
+                        count = Math.ceil((size - json.pos) / fileSplitSize);
+                        fileArray.length = 0;
+                        for(var i = count; i > 0; i--) {
+                            fileArray.push(i);
+                        }
+                        for(i = 0; i < MAX_LINK; i++) {
+                            funFileSize(true);
+                        }
+                    } else if(json.chunk) {
+                        fileArray.push(xhr.response.block);
+                        funFileSize(true);
+                    } else {
+                        funFileSize(true);
+                    }
+                }
+            } else {
+                fileArray.push(current);
+                funFileSize(true);
+            }
+        }
+    };
+    xhr.send(data);*/
+</script>
+</body>
+</html>
