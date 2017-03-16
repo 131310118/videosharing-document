@@ -54,7 +54,9 @@ export default class Nav extends Component {
     getNav() {
         return this.nav.map((navName, index) => {
             return (
-                <TouchableHighlight underlayColor={'#ef759c'} style={{flex: 0, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, height: this.props.height}} key={navName + index} onPress={() => {this.props.pageTo(index)}} onLayout={this.measureTab.bind(this, index)}>
+                <TouchableHighlight underlayColor={'#ef759c'} style={{flex: 0, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, height: this.props.height}}
+                                    key={navName + index} onPress={() => {this.props.pageTo(index)}}
+                                    onLayout={this.measureTab.bind(this, index)}>
                     <Text style={{color: '#fdc7d6', textAlign: 'center'}}>
                         {navName}
                     </Text>

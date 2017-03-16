@@ -42,7 +42,8 @@ class NaviModule extends Component {
         opacity: new Animated.Value(0),
         bgLeft: new Animated.Value(-totalWidth),
         headerTop: new Animated.Value(0),
-        scrollValue: new Animated.Value(0)
+        scrollValue: new Animated.Value(0),
+        //slideTo: 2
     };
     //Header start
     press = false;
@@ -99,11 +100,19 @@ class NaviModule extends Component {
         this.state.scrollValue.setValue(value);
     };
     onPageSelected(event) {
+        //console.log(event.nativeEvent.position);
         //this.setState({page: event.nativeEvent.position});
     };
     onPageScrollStateChanged(state) {
+        //console.log(state);
         //this.setState({scrollState: state});
     };
+    //slide start
+   /* slideTo(p) {
+        this.setState({
+            slideTo: p
+        })
+    }*/
     //index start
     onBackAndroid = (event) => {
         const {navigator} = this.refs;
@@ -159,13 +168,13 @@ class NaviModule extends Component {
                                           onPageScrollStateChanged={this.onPageScrollStateChanged.bind(this)} style={{flex: 1}}>
                             <View>
                                 <ScrollView refreshControl={<RefreshControl refreshing={true} style={{backgroundColor: '#eaeaea'}}/>} showsVerticalScrollIndicator={true}>
-                                    <Slide totalWidth={totalWidth} onSlide='2' style={{height: 337 / 3}}/>
+                                    <Slide totalWidth={totalWidth} onSlide={0} style={{height: 337 / 3}}/>
                                     <Artical totalWidth={totalWidth}/>
                                 </ScrollView>
                             </View>
                             <View>
                                 <ScrollView refreshControl={<RefreshControl refreshing={true} style={{backgroundColor: '#eaeaea'}}/>} showsVerticalScrollIndicator={true}>
-                                    <Slide totalWidth={totalWidth} onSlide='2' style={{height: 337 / 3}}/>
+                                    <Slide totalWidth={totalWidth} onSlide={0} style={{height: 337 / 3}}/>
                                     <Artical totalWidth={totalWidth}/>
                                 </ScrollView>
                             </View>
